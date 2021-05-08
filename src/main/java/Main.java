@@ -1,4 +1,4 @@
-import View.*;
+import view.*;
 
 import java.sql.SQLException;
 
