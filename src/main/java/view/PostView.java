@@ -1,6 +1,6 @@
 package view;
 
-import controller.PostControllerImpl;
+import controller.PostController;
 import model.Post;
 
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class PostView implements View{
 
     private Scanner in = new Scanner(System.in);
-    private PostControllerImpl postController = new PostControllerImpl();
+    private PostController postController = new PostController();
     private View startView = new StartView();
 
     @Override

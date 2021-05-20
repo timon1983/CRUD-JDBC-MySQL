@@ -16,7 +16,6 @@ class RegionServiceTest {
     RegionRepositoryImpl regionRepository = Mockito.mock(RegionRepositoryImpl.class);
     @Mock
     RegionService regionServiceMock = Mockito.mock(RegionService.class);
-    RegionService regionService = new RegionService(regionRepository);
 
     @Test
     void checkSaveService_Should_Return_Region() {

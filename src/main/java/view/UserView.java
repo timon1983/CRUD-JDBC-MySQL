@@ -1,6 +1,6 @@
 package view;
 
-import controller.UserControllerImpl;
+import controller.UserController;
 import model.User;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class UserView implements View {
 
     private Scanner in = new Scanner(System.in);
-    private UserControllerImpl userController = new UserControllerImpl();
+    private UserController userController = new UserController();
     private View startView = new StartView();
 
     @Override

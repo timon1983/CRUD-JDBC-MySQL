@@ -1,6 +1,6 @@
 package view;
 
-import controller.RegionControllerImpl;
+import controller.RegionController;
 import model.Region;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class RegionView implements View{
 
     private Scanner in = new Scanner(System.in);
-    private RegionControllerImpl regionController = new RegionControllerImpl();
+    private RegionController regionController = new RegionController();
     private View startView = new StartView();
 
     @Override

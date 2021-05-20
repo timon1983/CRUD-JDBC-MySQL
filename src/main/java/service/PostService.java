@@ -8,20 +8,15 @@ import java.util.List;
 
 public class PostService {
 
-    private GenericReposiroty postRepository;
-
-
-    public PostService(PostRepositoryImpl postRepository){
-        this.postRepository = postRepository;
-    }
+    private PostRepositoryImpl postRepository = new PostRepositoryImpl();
 
     public Post checkSaveService(String content, Long created, Long updated) {
         Post post = new Post(0L, content, created, updated );
-        return (Post) postRepository.save(post);
+        return postRepository.save(post);
     }
 
     public Post checkGetByIdService(Long id) {
-        Post post = (Post) postRepository.getById(id);
+        Post post = postRepository.getById(id);
         if (post != null) {
             return post;
         }else {
@@ -41,7 +36,7 @@ public class PostService {
 
     public Post checkUpdateService(Long id, String content, Long created, Long updated) {
         Post post = new Post(id, content, created, updated);
-        Post postUpdate = (Post) postRepository.update(post);
+        Post postUpdate = postRepository.update(post);
         if (postUpdate != null) {
             return postUpdate;
         }else{
@@ -51,7 +46,7 @@ public class PostService {
 
     public void checkDeleteByIdService(Long id) {
         PostView view = new PostView();
-        Post post = (Post) postRepository.getById(id);
+        Post post = postRepository.getById(id);
         postRepository.deleteById(id);
         if (post == null) {
             view.printNoSuchElement();

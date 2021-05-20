@@ -8,18 +8,15 @@ import java.util.List;
 
 public class RegionService {
 
-    private GenericReposiroty regionRepository;
+    private RegionRepositoryImpl regionRepository = new RegionRepositoryImpl();
 
-    public RegionService(RegionRepositoryImpl regionRepository){
-        this.regionRepository = regionRepository;
-    }
     public Region checkSaveService(String name){
         Region region = new Region(0,name);
-        return (Region) regionRepository.save(region);
+        return regionRepository.save(region);
     }
 
     public Region checkGetByIdService(Long id) {
-        Region region = (Region) regionRepository.getById(id);
+        Region region = regionRepository.getById(id);
         if (region != null) {
             return region;
         }else {
@@ -39,7 +36,7 @@ public class RegionService {
 
     public Region checkUpdateService(Long id, String name) {
         Region region = new Region(id, name);
-        Region regionUpdate = (Region) regionRepository.update(region);
+        Region regionUpdate = regionRepository.update(region);
         if (regionUpdate != null) {
             return regionUpdate;
         }else{
@@ -49,7 +46,7 @@ public class RegionService {
 
     public void checkDeleteByIdService(Long id) {
         RegionView view = new RegionView();
-        Region region = (Region) regionRepository.getById(id);
+        Region region = regionRepository.getById(id);
          regionRepository.deleteById(id);
         if (region == null) {
             view.printNoSuchElement();

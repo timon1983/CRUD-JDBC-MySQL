@@ -17,15 +17,13 @@ class UserServiceTest {
     private UserRepositoryImpl userRepository = Mockito.mock(UserRepositoryImpl.class);
     @Mock
     private UserService userServiceMock = Mockito.mock(UserService.class);
-    private UserService userService = new UserService(userRepository);
-
 
     @Test
     void checkSaveService_Should_Return_User() {
         List<Post> posts = new ArrayList<>();
         Region region = new Region(0,"Russia");
         User user = new User(0,"Igor","Golin", posts,region);
-        when(userService.checkSaveService("Igor","Golin","Russia")).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
     }
 
     @Test
@@ -33,12 +31,12 @@ class UserServiceTest {
         List<Post> posts = new ArrayList<>();
         Region region = new Region(0,"Russia");
         User user = new User(2,"Igor","Golin", posts,region);
-        when(userService.checkGetByIdService(2L)).thenReturn(user);
+        when(userRepository.getById(2L)).thenReturn(user);
     }
     @Test
     void checkGetAllService_Should_Show_All_of_Users(){
         List<User> users = new ArrayList<>();
-        when(userService.checkGetAllService()).thenReturn(users);
+        when(userRepository.getAll()).thenReturn(users);
     }
 
     @Test
@@ -46,7 +44,7 @@ class UserServiceTest {
         List<Post> posts = new ArrayList<>();
         Region region = new Region(0,"Russia");
         User user = new User(3,"Igor","Golin", posts,region);
-        when(userService.checkUpdateService(3L,"Igor","Golin", "Russia")).thenReturn(user);
+        when(userRepository.update(user)).thenReturn(user);
     }
 
     @Test
