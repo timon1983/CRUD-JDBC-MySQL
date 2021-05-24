@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 public class Util {
     private static Util util;
-    private String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    private String DATABASE_URL = "jdbc:mysql://localhost:3306/crud-jdbc";
-    private String USER = "root";
-    private String PASSWORD = "root";
+    private static String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static String DATABASE_URL = "jdbc:mysql://localhost:3306/crud-jdbc";
+    private static String USER = "root";
+    private static String PASSWORD = "root";
 
     public static Util getUtil(){
         if(util == null){
@@ -20,7 +20,7 @@ public class Util {
 
     private Util(){}
 
-    public Connection getConnection(){
+    public static Connection getConnection(){
         Connection connection = null;
         try {
             Class.forName(JDBC_DRIVER);

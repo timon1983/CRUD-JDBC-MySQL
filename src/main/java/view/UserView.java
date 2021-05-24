@@ -17,7 +17,6 @@ public class UserView implements View {
         long idIn;
         String firstNameIn;
         String lastNameIn;
-        long regionIdIn;
         String regionNameIn;
         System.out.println("1-Create user\n2-Get user by id\n3-Get all users\n" +
                 "4-Change record\n5-Delete user\n6-Exit");

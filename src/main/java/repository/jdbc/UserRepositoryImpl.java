@@ -5,74 +5,34 @@ import model.Region;
 import model.User;
 import repository.UserRepository;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class UserRepositoryImpl implements UserRepository {
-    Util util = Util.getUtil();
 
     @Override
     public User getById(Long id) {
-        User user = new User(0, null,null, null, null);
-        Region region = new Region(0, null);
+        User userGetById = null;
+        Set<User> usersUnic = new HashSet<>();
+        Set<Post> postsUnic = new HashSet<>();
         List<Post> posts = new ArrayList<>();
-        try (Connection connection = util.getConnection();
-             Statement statementUser = connection.createStatement();
-             Statement statementPost = connection.createStatement())
+        try (Connection connection = Util.getConnection();
+             Statement statementUser = connection.createStatement())
         {
-                String sqlSelUsersAndRegions = "SELECT * FROM users JOIN regions USING(user_id) WHERE user_id = " + id;
-                String sqlSelectPosts = "SELECT * FROM posts";
-                ResultSet resultSetUsersAndRegions = statementUser.executeQuery(sqlSelUsersAndRegions);
-                ResultSet resultSetPosts = statementPost.executeQuery(sqlSelectPosts);
-            if (!resultSetUsersAndRegions.next()) {
-                return null;
-            }else{
-                user.setId(resultSetUsersAndRegions.getLong("user_id"));
-                user.setFirstName(resultSetUsersAndRegions.getString("first_name"));
-                user.setLastName(resultSetUsersAndRegions.getString("last_name"));
-                region.setId(resultSetUsersAndRegions.getLong("region_id"));
-                region.setName(resultSetUsersAndRegions.getString("region_name"));
-                user.setRegion(region);
-                    while (resultSetPosts.next()) {
-                        Post post = new Post(0, null, 0, 0);
-                        post.setId(resultSetPosts.getLong("post_id"));
-                        post.setContent(resultSetPosts.getString("content"));
-                        post.setCreated(resultSetPosts.getLong("created"));
-                        post.setUpdated(resultSetPosts.getLong("updated"));
-                        posts.add(post);
-                    }
-                    user.setPosts(posts);}
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Statement ERROR");
-            }
-            return user;
-    }
-
-    @Override
-    public List<User> getAll() {
-        List<User> users = new ArrayList<>();
-        List<Post> posts = new ArrayList<>();
-        try (Connection connection = util.getConnection();
-             Statement statementUser = connection.createStatement();
-             Statement statementPost = connection.createStatement())
-        {
-                String sqlSelUsersAndRegions = "SELECT * FROM users JOIN regions USING(user_id)";
-                String sqlSelectPosts = "SELECT * FROM posts";
-                ResultSet resultSetUsersAndRegions = statementUser.executeQuery(sqlSelUsersAndRegions);
-                ResultSet resultSetPosts = statementPost.executeQuery(sqlSelectPosts);
+            String sqlSelUsersAndRegions = "SELECT * FROM (SELECT * FROM users JOIN regions USING(user_id) WHERE user_id = " +
+                     + id + ") FULL JOIN posts";
+            ResultSet resultSetUsersAndRegions = statementUser.executeQuery(sqlSelUsersAndRegions);
             if (resultSetUsersAndRegions == null) {
                 return null;
             } else {
-                while (resultSetPosts.next()) {
-                    Post post = new Post(0, null, 0, 0);
-                    post.setId(resultSetPosts.getLong("post_id"));
-                    post.setContent(resultSetPosts.getString("content"));
-                    post.setCreated(resultSetPosts.getLong("created"));
-                    post.setUpdated(resultSetPosts.getLong("updated"));
-                    posts.add(post);
-                }
                 while (resultSetUsersAndRegions.next()) {
+                    Post post = new Post(0, null, 0, 0);
+                    post.setId(resultSetUsersAndRegions.getLong("post_id"));
+                    post.setContent(resultSetUsersAndRegions.getString("content"));
+                    post.setCreated(resultSetUsersAndRegions.getLong("created"));
+                    post.setUpdated(resultSetUsersAndRegions.getLong("updated"));
+                    postsUnic.add(post);
                     User user = new User(0, null, null, null, null);
                     Region region = new Region(0, null);
                     user.setId(resultSetUsersAndRegions.getLong("user_id"));
@@ -81,9 +41,54 @@ public class UserRepositoryImpl implements UserRepository {
                     region.setId(resultSetUsersAndRegions.getLong("region_id"));
                     region.setName(resultSetUsersAndRegions.getString("region_name"));
                     user.setRegion(region);
-                    user.setPosts(posts);
-                    users.add(user);
+                    usersUnic.add(user);
                 }
+                posts.addAll(postsUnic);
+                userGetById = usersUnic.stream().findFirst().get();
+                userGetById.setPosts(posts);
+            }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Statement ERROR");
+            }
+            return userGetById;
+    }
+
+    @Override
+    public List<User> getAll() {
+        Set<User> usersUnic = new HashSet<>();
+        List<User> users = new ArrayList<>();
+        Set<Post> postsUnic = new HashSet<>();
+        List<Post> posts = new ArrayList<>();
+        try (Connection connection = Util.getConnection();
+             Statement statementUser = connection.createStatement())
+        {
+            String sqlSelUsersAndRegions = "SELECT * FROM (SELECT * FROM users JOIN regions USING(user_id)) FULL JOIN posts";
+            ResultSet resultSetUsersAndRegions = statementUser.executeQuery(sqlSelUsersAndRegions);
+            if (resultSetUsersAndRegions == null) {
+                return null;
+            } else {
+                while (resultSetUsersAndRegions.next()) {
+                    Post post = new Post(0, null, 0, 0);
+                    post.setId(resultSetUsersAndRegions.getLong("post_id"));
+                    post.setContent(resultSetUsersAndRegions.getString("content"));
+                    post.setCreated(resultSetUsersAndRegions.getLong("created"));
+                    post.setUpdated(resultSetUsersAndRegions.getLong("updated"));
+                    postsUnic.add(post);
+                    User user = new User(0, null, null, null, null);
+                    Region region = new Region(0, null);
+                    user.setId(resultSetUsersAndRegions.getLong("user_id"));
+                    user.setFirstName(resultSetUsersAndRegions.getString("first_name"));
+                    user.setLastName(resultSetUsersAndRegions.getString("last_name"));
+                    region.setId(resultSetUsersAndRegions.getLong("region_id"));
+                    region.setName(resultSetUsersAndRegions.getString("region_name"));
+                    user.setRegion(region);
+                    usersUnic.add(user);
+                }
+                posts.addAll(postsUnic);
+                users = usersUnic.stream().map(x ->{ x.setPosts(posts);
+                return x;
+                }).collect(Collectors.toList());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,7 +99,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user)  {
-        try (Connection connection = util.getConnection();
+        try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()){
             String sqlInsertUsers = "INSERT INTO users(first_name , last_name) " +
                     "VALUES ('" + user.getFirstName() + "','" + user.getLastName() + "')";
@@ -103,8 +108,7 @@ public class UserRepositoryImpl implements UserRepository {
                     "VALUES ('" + user.getRegion().getName() + "',(SELECT MAX(user_id) FROM users))";
             statement.executeUpdate(sqlInsertRegion);
 
-            String sqlNewUser = "SELECT * FROM users JOIN regions USING(user_id)" +
-                    " WHERE user_id = (SELECT MAX(user_id) FROM users)";
+            String sqlNewUser = "SELECT * FROM users JOIN regions USING(user_id) ORDER BY user_id DESC LIMIT 1";
             ResultSet resultSetNewUser = statement.executeQuery(sqlNewUser);
             resultSetNewUser.next();
             long newUserID = resultSetNewUser.getLong("user_id");
@@ -120,7 +124,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User update(User user) {
-        try (Connection connection = util.getConnection();
+        try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
                 String sqlUpdateUser = "UPDATE users SET first_name = '" + user.getFirstName() + "', last_name = '" +
                         user.getLastName() + "' WHERE user_id = " + user.getId();
@@ -137,7 +141,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void deleteById(Long id) {
-        try (Connection connection = util.getConnection();
+        try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
                 String sqlDeleteUser = "DELETE FROM users WHERE user_id = " + id;
                 String sqlDeleteRegion = "DELETE FROM regions WHERE user_id = " + id;
